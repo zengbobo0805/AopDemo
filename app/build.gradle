@@ -1,0 +1,120 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 26
+    buildToolsVersion '26.0.2'
+    defaultConfig {
+        applicationId "com.bobo.aop"
+        minSdkVersion 16
+        targetSdkVersion 26
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        signingConfig signingConfigs.debug
+
+        flavorDimensions "versionCode"//,"versionName"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    signingConfigs {
+        config {
+            keyAlias 'xrzgp'
+            keyPassword 'zhangchen31'
+            storeFile file('/Users/bobozeng/dev/gitlab/xrz_application/richeninfoKey_3x.3x')
+            storePassword 'zhangchen31'
+        }
+        debug {
+            keyAlias 'xrzgp'
+            keyPassword 'zhangchen31'
+            storeFile file('/Users/bobozeng/dev/gitlab/xrz_application/richeninfoKey_3x.3x')
+            storePassword 'zhangchen31'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    productFlavors {
+        server {
+            minSdkVersion 16
+            signingConfig signingConfigs.config
+        }
+
+//        baidu {
+//            minSdkVersion 16
+//            signingConfig signingConfigs.config
+//        }
+    }
+
+}
+
+//AndroidAopDemo.build.gradle
+//此处是编译一个App，所以使用的applicationVariants变量，否则使用libraryVariants变量
+//这是由Android插件引入的。所以，需要
+//import com.android.build.gradle.AppPlugin
+android.applicationVariants.all { variant ->
+    /*
+      这段代码之意是：
+      当app编译个每个variant之后，在javaCompile任务的最后添加一个action。此action
+      调用ajc函数，对上一步生成的class文件进行aspectj处理。
+    */
+//    AppPlugin plugin = project.plugins.getPlugin(AppPlugin)
+    JavaCompile javaCompile = variant.javaCompile
+    javaCompile.doLast {
+        String bootclasspath = project.android.bootClasspath.join(File.pathSeparator)
+        //ajc是一个函数，位于utils.gradle中
+        ajc(bootclasspath, javaCompile)
+    }
+}
+
+import org.aspectj.bridge.IMessage
+import org.aspectj.bridge.MessageHandler
+import org.aspectj.tools.ajc.Main
+
+def ajc(String androidbootClassFiles,JavaCompile javaCompile){
+    String[] args = ["-showWeaveInfo",
+                     "-1.8", //1.8是为了兼容java 8。请根据自己java的版本合理设置它
+                     "-inpath",javaCompile.destinationDir.toString(),
+                     "-aspectpath",javaCompile.classpath.asPath,
+                     "-d",javaCompile.destinationDir.toString(),
+                     "-classpath",javaCompile.classpath.asPath]//,
+//                     "-bootclasspath", androidbootClassFiles]
+    MessageHandler handler = new MessageHandler(true)
+    new Main().run(args,handler)
+
+    def log = project.logger
+    for(IMessage message : handler.getMessages(null, true)) {
+        switch (message.getKind()) {
+            case IMessage.ABORT:
+            case IMessage.ERROR:
+            case IMessage.FAIL:
+                log.error message.message, message.thrown
+                throw message.thrown
+                break
+            case IMessage.WARNING:
+            case IMessage.INFO:
+                log.info message.message, message.thrown
+                break
+            case IMessage.DEBUG:
+                log.debug message.message, message.thrown
+                break
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+    implementation 'org.aspectj:aspectjrt:1.8.1'
+
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+}
