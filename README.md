@@ -9,18 +9,17 @@
       必须使用@AspectJ标注
     
  <h4>2.@Pointcut </h4>
-      pointcut也变成了一个注解，这个注解是针对一个函数的，比如此处的logForActivity()
-      其实它代表了这个pointcut的名字。如果是带参数的pointcut，则把参数类型和名字放到
-      代表pointcut名字的logForActivity中，然后在@Pointcut注解中使用参数名。
-      基本和以前一样，只是写起来比较奇特一点。后面我们会介绍带参数的例子
-      *****************************
+       pointcut也变成了一个注解，这个注解是针对一个函数的，比如此处的logForActivity()
+       其实它代表了这个pointcut的名字。如果是带参数的pointcut，则把参数类型和名字放到
+       代表pointcut名字的logForActivity中，然后在@Pointcut注解中使用参数名。
+       基本和以前一样，只是写起来比较奇特一点。后面我们会介绍带参数的例子
+
           private static final String POINTCUT_METHOD =
               "call(@com.bobo.aop.annotation.LogTrace * *(..))";
 
           private static final String POINTCUT_CONSTRUCTOR =
               "call(@com.bobo.aop.annotation.LogTrace  *.new(..))";
 
-      *****************************
  <h4> 3.@Before/@After/@Around     </h4>
 
       @Before：这就是Before的advice，对于after，after -returning，和after-throwing。对于的注解格式为
