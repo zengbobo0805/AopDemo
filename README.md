@@ -1,3 +1,4 @@
+
 # AopDemo
 
 ## LogCallAspect.java 自动匹配
@@ -88,3 +89,6 @@
                 }
             }
    
+   #参考文档：
+       1.http://blog.csdn.net/innost/article/details/49387395
+       2.http://www.jianshu.com/p/0fa8073fd144
