@@ -13,7 +13,6 @@ import com.bobo.aop.model.Student;
 
 public class MethodActivity extends AppCompatActivity implements View.OnClickListener{
     private TextView tv_1;
-    private Student stu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,7 +21,6 @@ public class MethodActivity extends AppCompatActivity implements View.OnClickLis
         tv_1 = findViewById(R.id.tv_1);
         tv_1.setOnClickListener(this);
 //        new Student();
-       stu= new Student("11",11);
     }
 
 
